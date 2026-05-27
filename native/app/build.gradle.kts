@@ -12,8 +12,8 @@ android {
         applicationId = "top.ipla.phone_proxy"
         minSdk = 21
         targetSdk = 34
-        versionCode = 4
-        versionName = "2.0.0"
+        versionCode = 2000002
+        versionName = "2.0.2"
     }
 
     buildTypes {
