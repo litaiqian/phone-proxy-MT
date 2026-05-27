@@ -120,7 +120,6 @@ data class TeamListResponse(
 data class TeamAddRequest(@SerializedName("user_id") val userId: String)
 
 // ==================== 心跳 ====================
-data class HeartbeatRequest(empty: Unit = Unit)
 data class HeartbeatResponse(val ok: Boolean?, val error: String? = null)
 
 // ==================== 中签通知 ====================

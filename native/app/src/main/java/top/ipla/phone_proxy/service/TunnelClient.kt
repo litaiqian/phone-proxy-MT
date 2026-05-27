@@ -55,13 +55,13 @@ class TunnelClient(
         }
     }
 
-    private suspend fun reconnect(deviceId: String, deviceName: String) {
+    private suspend fun reconnect(deviceId: String, deviceName: String) =
         suspendCancellableCoroutine<Unit> { cont ->
+            cont.invokeOnCancellation { webSocket?.close(1000, null) }
             val request = Request.Builder().url(WS_URL).build()
             webSocket = client.newWebSocket(request, object : WebSocketListener() {
                 override fun onOpen(ws: WebSocket, response: Response) {
                     Log.d(TAG, "WebSocket 已连接")
-                    // 注册
                     val registerMsg = JSONObject().apply {
                         put("type", "register")
                         put("name", deviceName)
@@ -87,7 +87,6 @@ class TunnelClient(
                 }
             })
         }
-    }
 
     private fun handleMessage(ws: WebSocket, text: String) {
         try {
@@ -135,15 +134,12 @@ class TunnelClient(
             }.toString())
 
             // TCP → WebSocket
-            launch(Dispatchers.IO) {
+            scope.launch(Dispatchers.IO) {
                 try {
                     val buffer = ByteArray(8192)
                     while (running) {
                         val n = remote.getInputStream().read(buffer)
                         if (n <= 0) break
-                        val prefix = "T$tunnelId".toByteArray()
-                        ws.send(okhttp3.internal.Util.EMPTY_BYTE_ARRAY).let { }
-                        // 使用 BinaryMessage
                         val data = ByteArray(13 + n)
                         System.arraycopy("T".toByteArray(), 0, data, 0, 1)
                         System.arraycopy(tunnelId.toByteArray(), 0, data, 1, 12)

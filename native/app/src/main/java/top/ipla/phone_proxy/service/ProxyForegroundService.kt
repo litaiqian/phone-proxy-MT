@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.IBinder
+import android.content.pm.ServiceInfo
 import android.os.PowerManager
 import androidx.core.app.NotificationCompat
 import top.ipla.phone_proxy.PhoneProxyApp

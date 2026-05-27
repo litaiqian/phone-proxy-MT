@@ -13,6 +13,9 @@ import kotlinx.coroutines.delay
 import top.ipla.phone_proxy.PhoneProxyApp
 import top.ipla.phone_proxy.data.ApiClient
 import top.ipla.phone_proxy.data.CatFoodResponse
+import top.ipla.phone_proxy.ui.theme.Green
+import top.ipla.phone_proxy.ui.theme.Gold
+import top.ipla.phone_proxy.ui.theme.Grey
 
 @Composable
 fun HomeScreen() {
