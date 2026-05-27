@@ -80,15 +80,31 @@ class ProxyForegroundService : Service() {
 
     private fun startHeartbeat() {
         scope.launch {
+            var tick = 0
             while (isActive) {
                 if (ApiClient.token.isNotEmpty()) {
                     try {
                         ApiClient.service.heartbeat()
                     } catch (_: Exception) {}
                 }
+                // 每20分钟续期 WakeLock，防止锁屏后 CPU 进入深度休眠
+                tick++
+                if (tick % 20 == 0) {
+                    refreshWakeLock()
+                }
                 delay(60_000)
             }
         }
+    }
+
+    private fun refreshWakeLock() {
+        if (!::wakeLock.isInitialized) return
+        try {
+            if (wakeLock.isHeld) {
+                wakeLock.release()
+            }
+            wakeLock.acquire(30 * 60 * 1000L)
+        } catch (_: Exception) {}
     }
 
     private fun updateNotification(text: String) {
