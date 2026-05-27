@@ -13,6 +13,7 @@ import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.launch
 import top.ipla.phone_proxy.data.ApiClient
 import top.ipla.phone_proxy.data.RegisterRequest
+import top.ipla.phone_proxy.ui.theme.Green
 
 @Composable
 fun RegisterScreen(onBack: () -> Unit) {

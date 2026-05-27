@@ -15,6 +15,9 @@ import top.ipla.phone_proxy.PhoneProxyApp
 import top.ipla.phone_proxy.data.ApiClient
 import top.ipla.phone_proxy.data.ChangePwRequest
 import top.ipla.phone_proxy.service.ProxyForegroundService
+import top.ipla.phone_proxy.ui.theme.Gold
+import top.ipla.phone_proxy.ui.theme.Grey
+import top.ipla.phone_proxy.ui.theme.Red
 
 @Composable
 fun ProfileScreen(onLogout: () -> Unit) {

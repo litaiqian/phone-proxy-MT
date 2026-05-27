@@ -14,7 +14,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.launch
 import top.ipla.phone_proxy.data.*
+import top.ipla.phone_proxy.ui.theme.Accent
+import top.ipla.phone_proxy.ui.theme.CardBg
+import top.ipla.phone_proxy.ui.theme.DarkGrey
+import top.ipla.phone_proxy.ui.theme.Gold
+import top.ipla.phone_proxy.ui.theme.Green
+import top.ipla.phone_proxy.ui.theme.Grey
+import top.ipla.phone_proxy.ui.theme.Red
 import java.time.LocalTime
+import androidx.compose.ui.graphics.Color
 
 @Composable
 fun TeamScreen() {
@@ -26,7 +34,7 @@ fun TeamScreen() {
     var bindMsg by remember { mutableStateOf("") }
     val scope = rememberCoroutineScope()
 
-    val timeStatus = remember {
+    val timeStatus: Pair<String, Color> = remember {
         val now = LocalTime.now()
         val t = now.hour * 60 + now.minute
         when {
@@ -72,13 +80,13 @@ fun TeamScreen() {
                 Card(modifier = Modifier.fillMaxWidth().padding(vertical = 2.dp), colors = CardDefaults.cardColors(containerColor = CardBg)) {
                     Row(modifier = Modifier.padding(8.dp)) {
                         Text(a.phone ?: "***", fontSize = 12.sp, modifier = Modifier.weight(0.3f))
-                        val (st, sc) = when (a.loginStatus) {
+                        val (st: String, sc: Color) = when (a.loginStatus) {
                             "success" -> "正常" to Green
                             "offline" -> "掉线" to Gold
                             else -> "未登录" to Red
                         }
                         Text(st, fontSize = 12.sp, color = sc, modifier = Modifier.weight(0.22f))
-                        val (tt, tc) = when (a.accountType) {
+                        val (tt: String, tc: Color) = when (a.accountType) {
                             "white" -> "白号" to Green
                             "black" -> "黑号" to Red
                             else -> "正常" to Grey

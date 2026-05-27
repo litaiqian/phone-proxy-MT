@@ -55,38 +55,38 @@ class TunnelClient(
         }
     }
 
-    private suspend fun reconnect(deviceId: String, deviceName: String) =
-        suspendCancellableCoroutine<Unit> { cont ->
-            cont.invokeOnCancellation { webSocket?.close(1000, null) }
-            val request = Request.Builder().url(WS_URL).build()
-            webSocket = client.newWebSocket(request, object : WebSocketListener() {
-                override fun onOpen(ws: WebSocket, response: Response) {
-                    Log.d(TAG, "WebSocket 已连接")
-                    val registerMsg = JSONObject().apply {
-                        put("type", "register")
-                        put("name", deviceName)
-                        put("device_id", deviceId)
-                    }
-                    ws.send(registerMsg.toString())
+    private suspend fun reconnect(deviceId: String, deviceName: String) {
+        val deferred = CompletableDeferred<Unit>()
+        val request = Request.Builder().url(WS_URL).build()
+        webSocket = client.newWebSocket(request, object : WebSocketListener() {
+            override fun onOpen(ws: WebSocket, response: Response) {
+                Log.d(TAG, "WebSocket 已连接")
+                val registerMsg = JSONObject().apply {
+                    put("type", "register")
+                    put("name", deviceName)
+                    put("device_id", deviceId)
                 }
+                ws.send(registerMsg.toString())
+            }
 
-                override fun onMessage(ws: WebSocket, text: String) {
-                    handleMessage(ws, text)
-                }
+            override fun onMessage(ws: WebSocket, text: String) {
+                handleMessage(ws, text)
+            }
 
-                override fun onFailure(ws: WebSocket, t: Throwable, response: Response?) {
-                    Log.e(TAG, "WebSocket 失败: ${t.message}")
-                    onStatusChange(false, "", t.message ?: "error")
-                    if (cont.isActive) cont.resume(Unit)
-                }
+            override fun onFailure(ws: WebSocket, t: Throwable, response: Response?) {
+                Log.e(TAG, "WebSocket 失败: ${t.message}")
+                onStatusChange(false, "", t.message ?: "error")
+                if (!deferred.isCompleted) deferred.complete(Unit)
+            }
 
-                override fun onClosed(ws: WebSocket, code: Int, reason: String) {
-                    Log.d(TAG, "WebSocket 关闭: $code $reason")
-                    onStatusChange(false, "", "closed")
-                    if (cont.isActive) cont.resume(Unit)
-                }
-            })
-        }
+            override fun onClosed(ws: WebSocket, code: Int, reason: String) {
+                Log.d(TAG, "WebSocket 关闭: $code $reason")
+                onStatusChange(false, "", "closed")
+                if (!deferred.isCompleted) deferred.complete(Unit)
+            }
+        })
+        deferred.await()
+    }
 
     private fun handleMessage(ws: WebSocket, text: String) {
         try {
