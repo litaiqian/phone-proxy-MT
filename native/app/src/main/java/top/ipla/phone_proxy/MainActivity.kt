@@ -21,7 +21,10 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // 尝试自动登录
+        // 启动即隧道（无需登录，WebSocket 注册只发 device_id + name）
+        startProxyService()
+
+        // 尝试自动登录（验证/恢复 token）
         checkAutoLogin()
 
         setContent {
@@ -41,16 +44,15 @@ class MainActivity : ComponentActivity() {
             if (!token.isNullOrEmpty()) {
                 ApiClient.token = token!!
                 try {
-                    // 验证 token 是否有效
-                    val r = ApiClient.service.getCatFood()
-                    if (r.ok != false) {
-                        // Token 有效，启动前台服务
-                        startProxyService()
+                    // 验证 token 是否有效（用 bind_status）
+                    val r = ApiClient.service.getBindStatus()
+                    if (r.ok == false) {
+                        // Token 已失效
+                        PhoneProxyApp.instance.prefs.clearAuth()
+                        ApiClient.token = ""
                     }
                 } catch (_: Exception) {
-                    // Token 无效，清除
-                    PhoneProxyApp.instance.prefs.clearAuth()
-                    ApiClient.token = ""
+                    // 网络不通，保留 token 继续尝试
                 }
             }
         }

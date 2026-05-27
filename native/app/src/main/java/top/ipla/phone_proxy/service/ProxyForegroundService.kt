@@ -33,6 +33,10 @@ class ProxyForegroundService : Service() {
                 } else {
                     updateNotification("猫咪睡着了，正在唤醒…")
                 }
+            },
+            onChangeIp = {
+                NetworkUtil.changeIp(this)
+                updateNotification("IP 已切换")
             }
         )
     }

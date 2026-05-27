@@ -9,7 +9,8 @@ import java.util.concurrent.TimeUnit
 
 class TunnelClient(
     private val onWon: (phone: String, masked: String, item: String, orderId: String) -> Unit = { _, _, _, _ -> },
-    private val onStatusChange: (connected: Boolean, tunnelId: String, error: String) -> Unit = { _, _, _ -> }
+    private val onStatusChange: (connected: Boolean, tunnelId: String, error: String) -> Unit = { _, _, _ -> },
+    private val onChangeIp: () -> Unit = {}
 ) {
     companion object {
         private const val TAG = "TunnelClient"
@@ -106,7 +107,8 @@ class TunnelClient(
                     scope.launch { doConnect(ws, tid, host, port) }
                 }
                 "change_ip" -> {
-                    // IP 切换由服务端触发，由 ForegroundService 处理
+                    Log.d(TAG, "收到换IP指令")
+                    onChangeIp()
                 }
                 "won" -> {
                     onWon(
